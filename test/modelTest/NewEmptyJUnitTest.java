@@ -2,6 +2,7 @@ package modelTest;
 
 import java.util.Date;
 import model.Area;
+import model.SecurityGroup;
 import model.User;
 import model.UserState;
 import model.UserStateInside;
@@ -24,19 +25,25 @@ public class NewEmptyJUnitTest {
     private static User outsideUser;
     private static Area allowedArea;
     private static Area restrictedArea;
+    private static SecurityGroup group;
 
     public NewEmptyJUnitTest() {
     }
 
     @BeforeClass
     public static void setUpClass() {
+        allowedArea = new Area();
+        restrictedArea = new Area();
         absentUser = new User();
         outsideUser = new User();
         outsideUser.setState(new UserStateOutside(outsideUser));
         insideUser = new User();
-        insideUser.setState(new UserStateInside(insideUser));
-        allowedArea = new Area();
-        restrictedArea = new Area();
+        insideUser.setState(new UserStateInside(insideUser, allowedArea));
+        group = new SecurityGroup();
+        group.getAllowedAreas().add(allowedArea);
+        outsideUser.getGroups().add(group);
+        insideUser.getGroups().add(group);
+        absentUser.getGroups().add(group);
     }
 
     @AfterClass
@@ -160,6 +167,38 @@ public class NewEmptyJUnitTest {
     
     @Test
     public void insideUserAccessArea(){
+        assertFalse("Inside user accessed area!", insideUser.accessArea(restrictedArea,
+                new Date()));
+        
+        assertEquals("Inside user state changed to \"" + insideUser.getState() 
+                + "\" instead of staying the same", UserState.INSIDE, insideUser.getState().toString());
+    }
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="access restricted area attempts">
+    @Test
+    public void absentUserAccessRestrictedArea(){
+        assertFalse("Absent user accessed area!", absentUser.accessArea(restrictedArea,
+                new Date()));
+        
+        assertEquals("Absent user state changed to \"" + absentUser.getState() 
+                + "\" instead of staying the same", UserState.ABSENT, absentUser.getState().toString());
+    }
+    
+    @Test
+    public void outsideUserAccessRestrictedArea(){
+        assertFalse("Outside user can access restricted area!", 
+                outsideUser.accessArea(restrictedArea, new Date()));
+        
+        assertEquals("Outside user state changed to " + outsideUser.getState().toString()
+                + " instead of staying the same",
+                UserState.OUTSIDE, outsideUser.getState().toString());
+        
+        outsideUser.leaveArea(allowedArea, new Date());
+    }
+    
+    @Test
+    public void insideUserAccessRestrictedArea(){
         assertFalse("Inside user accessed area!", insideUser.accessArea(allowedArea,
                 new Date()));
         
@@ -210,6 +249,8 @@ public class NewEmptyJUnitTest {
         absentUser.accessArea(allowedArea, new Date());
         assertEquals(UserState.INSIDE, absentUser.getState().toString());
         absentUser.leaveArea(allowedArea, new Date());
+        assertEquals(UserState.OUTSIDE, absentUser.getState().toString());
+        absentUser.accessArea(restrictedArea, new Date());
         assertEquals(UserState.OUTSIDE, absentUser.getState().toString());
         absentUser.clockOut(new Date());
         assertEquals(UserState.ABSENT, absentUser.getState().toString());

@@ -5,6 +5,8 @@
  */
 package database;
 
+import database.mysql.MySqlDAOFactory;
+
 /**
  *
  * @author kashwaa
@@ -13,6 +15,7 @@ public abstract class DAOFactory {
     public static final int MY_SQL = 0;
     
     public abstract AreaDAO getAreaDAO();
+    public abstract UserDAO getUserDAO();
     
     public static DAOFactory getDAOFactory(int factoryType){
         switch(factoryType){

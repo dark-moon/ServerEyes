@@ -28,7 +28,7 @@ public class UserStateOutside implements UserState{
     @Override
     public boolean accessArea(Area area, Date time) {
         if(area.autherize(user)){
-            this.user.setState(new UserStateInside(this.user));
+            this.user.setState(new UserStateInside(this.user, area));
             return true;
         }
         return false;

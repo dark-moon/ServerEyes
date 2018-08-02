@@ -11,12 +11,14 @@ import java.util.Date;
  *
  * @author kashwaa
  */
-public class UserStateInside implements UserState{
+public class UserStateInside implements UserState {
 
     User user;
-    
-    public UserStateInside(User user) {
+    Area currentArea = null;
+
+    public UserStateInside(User user, Area area) {
         this.user = user;
+        this.currentArea = area;
     }
 
     @Override
@@ -36,10 +38,13 @@ public class UserStateInside implements UserState{
 
     @Override
     public boolean leaveArea(Area area, Date time) {
-        //TODO: ensure that the area requested to be left is the same area the 
+        //ensure that the area requested to be left is the same area the 
         //user is inside.
-        this.user.setState(new UserStateOutside(user));
-        return true;
+        if (area.getArea_id() == this.currentArea.getArea_id()) {
+            this.user.setState(new UserStateOutside(user));
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -47,9 +52,9 @@ public class UserStateInside implements UserState{
         //TODO: Authenticate the user before returning true.
         return true;
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return UserState.INSIDE;
     }
 }

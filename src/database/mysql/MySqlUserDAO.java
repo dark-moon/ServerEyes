@@ -1,53 +1,42 @@
-package database;
+package database.mysql;
 
+import database.UserDAO;
 import java.util.Collection;
-import java.util.Set;
-import model.Area;
 import model.User;
 
 /**
  *
  * @author kashwaa
  */
-public class MySqlAreaDAO implements AreaDAO{
+public class MySqlUserDAO implements UserDAO{
 
     @Override
-    public Area[] getAllAreas() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public int insertArea(Area area) {
+    public Collection<User> getAllUsers() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean updateArea(Area area) {
+    public User findUser(User user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean deleteArea(Area area) {
+    public Collection<User> findUsers(User criteria) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Area findArea(Area criteria) {
+    public int insertUser(User user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Collection<Area> findAreas(Area criteria) {
+    public boolean updateUser(User user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public Set<User> getAllowedUsers(Area area) {
-        throw new UnsupportedOperationException("Not supported yet."); 
-    }
-    
-    @Override
-    public boolean autherize(Area area, User user) {
+    public boolean deleteUser(User user) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
