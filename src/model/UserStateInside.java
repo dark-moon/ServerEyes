@@ -63,7 +63,7 @@ public class UserStateInside implements UserState {
                 new IncidentDetailsStateTransition(INSIDE, OUTSIDE, "leaveArea", time,
                         "Inside user trying to leave another area", user)).responde();
         Incident.createIncident(new IncidentDetailsPhysicalAccess(time, 
-                "Inside user tried to leave another Area", user, area, true)).responde();
+                "Inside user tried to leave another Area", user, area, false)).responde();
         return false;
     }
 
