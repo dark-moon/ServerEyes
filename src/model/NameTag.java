@@ -16,7 +16,7 @@ public class NameTag {
         return DAOFactory.getDAOFactory(daoFactoryType).getNameTagDAO();
     }
     
-    public NameTag(long signal){
+    public NameTag(int id, long signal){
         this.assignedSignal = signal;
     }
     

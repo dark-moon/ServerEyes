@@ -27,9 +27,9 @@ public class RFID_Reader {
     }
     
     //method to be called by the JNI API connected to the external RFID system.
-    public void handleSignal(long signal){
+    public void handleSignal(long signal, int id){
         User criteria = new User();
-        criteria.setTag(new NameTag(signal));
+        criteria.setTag(new NameTag(id, signal));
         this.parent.handleSignal(this, User.getUserDAO(DAOFactory.MY_SQL).findUser(criteria));
     }
     
