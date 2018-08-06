@@ -17,6 +17,7 @@ public class Area implements SecurityResource{
     public static final String ACTION_ACCESS = "Access area";
     public static final String ACTION_ALTER = "Alter area";
     
+    private RFIDControl rfidControl;
     private static final DAOFactory sqlDAOFactory = DAOFactory.getDAOFactory(DAOFactory.MY_SQL);
     
     private final List<ResourceAction> allowedActions;

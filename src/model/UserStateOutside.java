@@ -2,9 +2,8 @@ package model;
 
 import java.util.Date;
 import model.incident.Incident;
-import model.incident.IncidentDetails;
 import model.incident.IncidentDetailsPhysicalAccess;
-import model.incident.IncidentReporter;
+import model.incident.IncidentDetailsStateTransition;
 import model.security.ResourceAction;
 
 /**
@@ -12,7 +11,7 @@ import model.security.ResourceAction;
  * @author kashwaa
  */
 public class UserStateOutside implements UserState{
-    private User user;
+    private final User user;
 
     
     public UserStateOutside(User user) {
@@ -21,6 +20,9 @@ public class UserStateOutside implements UserState{
 
     @Override
     public boolean clockIn(Date time) {
+        Incident.createIncident(
+                new IncidentDetailsStateTransition(OUTSIDE, OUTSIDE, "clockIn", time,
+                        "Outside user trying to clock in", user)).responde();
         return false;
     }
 
@@ -37,12 +39,15 @@ public class UserStateOutside implements UserState{
             return true;
         }
         Incident.createIncident(new IncidentDetailsPhysicalAccess(time, 
-                "User tried to Enter unautherized Area", user, area)).responde();
+                "User tried to Enter unautherized Area", user, area, true)).responde();
         return false;
     }
 
     @Override
     public boolean leaveArea(Area area, Date time) {
+        Incident.createIncident(new IncidentDetailsStateTransition(OUTSIDE, OUTSIDE,
+                "leaveArea", time, 
+                "Outside user tried to leave area: " + area.getAreaName(), user)).responde();
         return false;
     }
 

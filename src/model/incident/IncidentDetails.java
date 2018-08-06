@@ -8,9 +8,9 @@ import java.util.Date;
  */
 public class IncidentDetails {
     
-    private final Date incidentTime;
-    private final String description;
-    private final IncidentReporter reporter;
+    protected final Date incidentTime;
+    protected final String description;
+    protected final IncidentReporter reporter;
     
     public IncidentDetails(Date time, String description, IncidentReporter reporter){
         this.incidentTime = time;
