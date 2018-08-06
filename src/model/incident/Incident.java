@@ -17,13 +17,16 @@ public class Incident {
     private IncidentResponse defaultResponse;
     private final IncidentDetails details;
     
-    private Incident(IncidentReporter reporter, IncidentDetails details){
-        this.reporter = reporter;
+    private Incident(IncidentDetails details){
         this.details = details;
+        this.reporter = details.getReporter();
+        this.defaultResponse = details.getReporter().getDefaultResponse();
+        this.decription = details.getIncidentDescription();
+        this.incidentTime = details.getIncidentTime();
     }
     
-    public static Incident createIncident(IncidentReporter reporter, IncidentDetails details){
-        return new Incident(reporter, details);
+    public static Incident createIncident(IncidentDetails details){
+        return new Incident(details);
     }
     
     public void changeResopnse(IncidentResponse desiredResponse){

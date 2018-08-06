@@ -1,6 +1,10 @@
 package model;
 
 import java.util.Date;
+import model.incident.Incident;
+import model.incident.IncidentDetails;
+import model.incident.IncidentDetailsPhysicalAccess;
+import model.incident.IncidentReporter;
 import model.security.ResourceAction;
 
 /**
@@ -32,6 +36,8 @@ public class UserStateOutside implements UserState{
             this.user.setState(new UserStateInside(this.user, area));
             return true;
         }
+        Incident.createIncident(new IncidentDetailsPhysicalAccess(time, 
+                "User tried to Enter unautherized Area", user, area)).responde();
         return false;
     }
 

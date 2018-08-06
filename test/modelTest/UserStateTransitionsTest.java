@@ -41,11 +41,15 @@ public class UserStateTransitionsTest {
         meetingArea.setAreaName("Meeting area");
         serverRoom.setAreaName("Server room");
         absentUser = new User();
+        absentUser.setUserName("absentUser");
         outsideUser = new User();
+        outsideUser.setUserName("outsideUser");
         outsideUser.setState(new UserStateOutside(outsideUser));
         insideUser = new User();
+        insideUser.setUserName("insideUser");
         insideUser.setState(new UserStateInside(insideUser, meetingArea));
         admin = new User();
+        admin.setUserName("admin");
         setupDummyRoles();
     }
 

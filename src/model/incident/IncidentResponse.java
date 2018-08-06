@@ -5,5 +5,5 @@ package model.incident;
  * @author kashwaa
  */
 public interface IncidentResponse {
-    public void respond(IncidentDetails details);
+    public <T extends IncidentDetails> void respond(T details);
 }
