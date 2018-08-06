@@ -15,7 +15,6 @@ public class User {
     
     private String userName, firstName, lastName, address, email;
     private NameTag tag;
-    private Collection<SecurityGroup> groups;
     private UserState state;
 
     public static Collection<User> getAllUsers(){
@@ -25,7 +24,6 @@ public class User {
     //<editor-fold defaultstate="collapsed" desc="Constructors">
     public User() {
         this.state = new UserStateAbsent(this);
-        this.groups = new HashSet<>();
     }
 
     public User(String userName, String firstName, String lastName, String address, String email) {
@@ -113,9 +111,5 @@ public class User {
     
     //</editor-fold>
 
-    //TODO: change the implementation form User-tickets to ACL Matrix.
-    public Collection<SecurityGroup> getGroups() {
-        return groups;
-    }
 
 }

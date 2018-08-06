@@ -1,6 +1,7 @@
 package model;
 
 import java.util.Date;
+import model.security.ResourceAction;
 
 /**
  *
@@ -27,7 +28,7 @@ public class UserStateOutside implements UserState{
 
     @Override
     public boolean accessArea(Area area, Date time) {
-        if(area.autherize(user)){
+        if(area.autherize(user, new ResourceAction(Area.ACTION_ACCESS))){
             this.user.setState(new UserStateInside(this.user, area));
             return true;
         }

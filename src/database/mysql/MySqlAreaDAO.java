@@ -1,10 +1,13 @@
 package database.mysql;
 
 import database.AreaDAO;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import model.Area;
 import model.User;
+import model.security.ResourceAction;
 
 /**
  *
@@ -50,6 +53,16 @@ public class MySqlAreaDAO implements AreaDAO{
     @Override
     public boolean autherize(Area area, User user) {
         return true;
+    }
+
+    @Override
+    public List<ResourceAction> getAllowedActions() {
+        //TODO: replace temp implementation with actual data retrival.
+        List<ResourceAction> result = new ArrayList<>();
+        result.add(new ResourceAction("Manage area access"));
+        result.add(new ResourceAction("Access area"));
+        result.add(new ResourceAction("Alter area"));
+        return result;
     }
     
 }

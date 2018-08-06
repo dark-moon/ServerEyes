@@ -1,9 +1,11 @@
 package database;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import model.Area;
 import model.User;
+import model.security.ResourceAction;
 
 /**
  *
@@ -18,4 +20,5 @@ public interface AreaDAO {
     public boolean deleteArea(Area area);
     public Collection<User> getAllowedUsers(Area area);
     public boolean autherize(Area area, User user);
+    public List<ResourceAction> getAllowedActions();
 }

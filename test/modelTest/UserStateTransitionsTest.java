@@ -2,11 +2,15 @@ package modelTest;
 
 import java.util.Date;
 import model.Area;
-import model.SecurityGroup;
+import model.AutherizationTable;
 import model.User;
 import model.UserState;
 import model.UserStateInside;
 import model.UserStateOutside;
+import model.security.Permission;
+import model.security.Policy;
+import model.security.ResourceAction;
+import model.security.Role;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -18,32 +22,31 @@ import static org.junit.Assert.*;
  *
  * @author kashwaa
  */
-public class NewEmptyJUnitTest {
+public class UserStateTransitionsTest {
 
     private static User absentUser;
     private static User insideUser;
     private static User outsideUser;
-    private static Area allowedArea;
-    private static Area restrictedArea;
-    private static SecurityGroup group;
+    private static Area meetingArea;
+    private static Area serverRoom;
+    private static User admin;
 
-    public NewEmptyJUnitTest() {
+    public UserStateTransitionsTest() {
     }
 
     @BeforeClass
     public static void setUpClass() {
-        allowedArea = new Area();
-        restrictedArea = new Area();
+        meetingArea = new Area();
+        serverRoom = new Area();
+        meetingArea.setAreaName("Meeting area");
+        serverRoom.setAreaName("Server room");
         absentUser = new User();
         outsideUser = new User();
         outsideUser.setState(new UserStateOutside(outsideUser));
         insideUser = new User();
-        insideUser.setState(new UserStateInside(insideUser, allowedArea));
-        group = new SecurityGroup();
-        group.getAllowedAreas().add(allowedArea);
-        outsideUser.getGroups().add(group);
-        insideUser.getGroups().add(group);
-        absentUser.getGroups().add(group);
+        insideUser.setState(new UserStateInside(insideUser, meetingArea));
+        admin = new User();
+        setupDummyRoles();
     }
 
     @AfterClass
@@ -71,7 +74,7 @@ public class NewEmptyJUnitTest {
         assertEquals("user state didn't transition correctly to \"outside\""
                 + " instead to \"" + absentUser.getState().toString(),
                 UserState.OUTSIDE, absentUser.getState().toString());
-        
+
         //clock out the absent user again to stay absent in the subsequent tests.
         absentUser.clockOut(new Date());
     }
@@ -108,7 +111,7 @@ public class NewEmptyJUnitTest {
     public void absentUserClockOut() {
         //Ensure that absent users can't clock-out.
         assertFalse("Absent user clocked-out!", absentUser.clockOut(new Date()));
-        
+
         //Ensure that trying to clock-out an already clocked-out user doesn't change
         //his state.
         assertEquals("user state transitioned to "
@@ -125,16 +128,16 @@ public class NewEmptyJUnitTest {
         assertEquals("user state didn't transition correctly to \"absent\""
                 + " instead to \"" + outsideUser.getState().toString(),
                 UserState.ABSENT, outsideUser.getState().toString());
-        
+
         //Clock outside user in again to stay outside in the subsequent tests.
         outsideUser.clockIn(new Date());
     }
-    
+
     @Test
-    public void insideUserClockOut(){
+    public void insideUserClockOut() {
         //Ensure that inside users can't clock-out.
         assertFalse("Inside user clocked-out!", insideUser.clockOut(new Date()));
-        
+
         //Ensure that trying to clock-out an inside user doesn't change
         //his state.
         assertEquals("user state transitioned to "
@@ -142,115 +145,115 @@ public class NewEmptyJUnitTest {
                 UserState.INSIDE, insideUser.getState().toString());
     }
     //</editor-fold>
-    
+
     //<editor-fold defaultstate="collapsed" desc="access allowed area attempts">
     @Test
-    public void absentUserAccessArea(){
-        assertFalse("Absent user accessed area!", absentUser.accessArea(allowedArea,
+    public void absentUserAccessArea() {
+        assertFalse("Absent user accessed area!", absentUser.accessArea(meetingArea,
                 new Date()));
-        
-        assertEquals("Absent user state changed to \"" + absentUser.getState() 
+
+        assertEquals("Absent user state changed to \"" + absentUser.getState()
                 + "\" instead of staying the same", UserState.ABSENT, absentUser.getState().toString());
     }
-    
+
     @Test
-    public void outsideUserAccessArea(){
-        assertTrue("Outside user can't access allowed area!", 
-                outsideUser.accessArea(allowedArea, new Date()));
-        
+    public void outsideUserAccessArea() {
+        assertTrue("Outside user can't access allowed area!",
+                outsideUser.accessArea(meetingArea, new Date()));
+
         assertEquals("Outside user state didn't transition correctly to \"INSIDE\""
                 + " instead to \"" + outsideUser.getState().toString(),
                 UserState.INSIDE, outsideUser.getState().toString());
-        
-        outsideUser.leaveArea(allowedArea, new Date());
+
+        outsideUser.leaveArea(meetingArea, new Date());
     }
-    
+
     @Test
-    public void insideUserAccessArea(){
-        assertFalse("Inside user accessed area!", insideUser.accessArea(restrictedArea,
+    public void insideUserAccessArea() {
+        assertFalse("Inside user accessed area!", insideUser.accessArea(serverRoom,
                 new Date()));
-        
-        assertEquals("Inside user state changed to \"" + insideUser.getState() 
+
+        assertEquals("Inside user state changed to \"" + insideUser.getState()
                 + "\" instead of staying the same", UserState.INSIDE, insideUser.getState().toString());
     }
     //</editor-fold>
-    
+
     //<editor-fold defaultstate="collapsed" desc="access restricted area attempts">
     @Test
-    public void absentUserAccessRestrictedArea(){
-        assertFalse("Absent user accessed area!", absentUser.accessArea(restrictedArea,
+    public void absentUserAccessRestrictedArea() {
+        assertFalse("Absent user accessed area!", absentUser.accessArea(serverRoom,
                 new Date()));
-        
-        assertEquals("Absent user state changed to \"" + absentUser.getState() 
+
+        assertEquals("Absent user state changed to \"" + absentUser.getState()
                 + "\" instead of staying the same", UserState.ABSENT, absentUser.getState().toString());
     }
-    
+
     @Test
-    public void outsideUserAccessRestrictedArea(){
-        assertFalse("Outside user can access restricted area!", 
-                outsideUser.accessArea(restrictedArea, new Date()));
-        
+    public void outsideUserAccessRestrictedArea() {
+        assertFalse("Outside user can access restricted area!",
+                outsideUser.accessArea(serverRoom, new Date()));
+
         assertEquals("Outside user state changed to " + outsideUser.getState().toString()
                 + " instead of staying the same",
                 UserState.OUTSIDE, outsideUser.getState().toString());
-        
-        outsideUser.leaveArea(allowedArea, new Date());
+
+        outsideUser.leaveArea(meetingArea, new Date());
     }
-    
+
     @Test
-    public void insideUserAccessRestrictedArea(){
-        assertFalse("Inside user accessed area!", insideUser.accessArea(allowedArea,
+    public void insideUserAccessRestrictedArea() {
+        assertFalse("Inside user accessed area!", insideUser.accessArea(meetingArea,
                 new Date()));
-        
-        assertEquals("Inside user state changed to \"" + insideUser.getState() 
+
+        assertEquals("Inside user state changed to \"" + insideUser.getState()
                 + "\" instead of staying the same", UserState.INSIDE, insideUser.getState().toString());
     }
     //</editor-fold>
-    
+
     //<editor-fold defaultstate="collapsed" desc="leave area attempts">
     @Test
-    public void absentUserLeaveArea(){
-        assertFalse("Absent user leaved area!", absentUser.leaveArea(allowedArea,
+    public void absentUserLeaveArea() {
+        assertFalse("Absent user leaved area!", absentUser.leaveArea(meetingArea,
                 new Date()));
-        
-        assertEquals("Absent user state changed to \"" + absentUser.getState() 
+
+        assertEquals("Absent user state changed to \"" + absentUser.getState()
                 + "\" instead of staying the same", UserState.ABSENT, absentUser.getState().toString());
     }
-    
+
     @Test
-    public void outsideUserLeaveArea(){
-        assertFalse("Outside user leaved area!", outsideUser.leaveArea(allowedArea,
+    public void outsideUserLeaveArea() {
+        assertFalse("Outside user leaved area!", outsideUser.leaveArea(meetingArea,
                 new Date()));
-        
-        assertEquals("Outside user state changed to \"" + outsideUser.getState() 
+
+        assertEquals("Outside user state changed to \"" + outsideUser.getState()
                 + "\" instead of staying the same", UserState.OUTSIDE, outsideUser.getState().toString());
-        
+
     }
-    
+
     @Test
-    public void insideUserLeaveArea(){
-        assertTrue("Inside user can't leave his area!", 
-                insideUser.leaveArea(allowedArea, new Date()));
-        
+    public void insideUserLeaveArea() {
+        assertTrue("Inside user can't leave his area!",
+                insideUser.leaveArea(meetingArea, new Date()));
+
         assertEquals("Inside user state didn't transition correctly to \"OUTSIDE\""
                 + " instead to \"" + insideUser.getState().toString(),
                 UserState.OUTSIDE, insideUser.getState().toString());
-        
-        insideUser.accessArea(allowedArea, new Date());
+
+        insideUser.accessArea(meetingArea, new Date());
     }
     //</editor-fold>
-    
+
     //<editor-fold defaultstate="collapsed" desc="Normal transitions test">
     @Test
-    public void testNormalTransitioins(){
+    public void testNormalTransitioins() {
         assertEquals(UserState.ABSENT, absentUser.getState().toString());
         absentUser.clockIn(new Date());
         assertEquals(UserState.OUTSIDE, absentUser.getState().toString());
-        absentUser.accessArea(allowedArea, new Date());
+        absentUser.accessArea(meetingArea, new Date());
         assertEquals(UserState.INSIDE, absentUser.getState().toString());
-        absentUser.leaveArea(allowedArea, new Date());
+        absentUser.leaveArea(meetingArea, new Date());
         assertEquals(UserState.OUTSIDE, absentUser.getState().toString());
-        absentUser.accessArea(restrictedArea, new Date());
+        absentUser.accessArea(serverRoom, new Date());
         assertEquals(UserState.OUTSIDE, absentUser.getState().toString());
         absentUser.clockOut(new Date());
         assertEquals(UserState.ABSENT, absentUser.getState().toString());
@@ -260,6 +263,71 @@ public class NewEmptyJUnitTest {
     @Test
     public void loggedInUserClockIn() {
         //TODO: implement the logged in user first.
+    }
+
+    private static void setupDummyRoles() {
+        model.security.SecurityManager securityManager = model.security.SecurityManager.getInstance();
+        
+        Area cafetria = new Area();
+        cafetria.setAreaName("Cafetria");
+        
+        Role roleRoot = securityManager.createRole("Root Access");
+        Role roleNetworkAdmin = securityManager.createRole("Network Admin Access");
+        Role roleDeveloper = securityManager.createRole("developer access");
+        
+        Policy policyManageSenstiveAreas = securityManager.createPolicy("Manage access to senstive areas");
+        Policy policyManageCommonAreas = securityManager.createPolicy("Manage access to common areas");
+        Policy policyAccessSenstiveAreas = securityManager.createPolicy("Access senstive areas");
+        Policy policyAccessCommonAreas = securityManager.createPolicy("Access common areas");
+        
+        Permission permissionManageServerRoom = new Permission(serverRoom);
+        Permission permissionManageMeetingArea = new Permission(meetingArea);
+        Permission permissionManageCafetria = new Permission(cafetria);
+        Permission permissionAccessServerRoom = new Permission(serverRoom);
+        Permission permissionAccessMeetingArea = new Permission(meetingArea);
+        Permission permissionAccessCafetria = new Permission(cafetria);
+        
+        ResourceAction actionAlterArea = new ResourceAction(Area.ACTION_ALTER);
+        ResourceAction actionManageAreaAccess = new ResourceAction(Area.ACTION_MANAGE);
+        ResourceAction actionAccessArea = new ResourceAction(Area.ACTION_ACCESS);
+        
+        //add actions to permissions
+        permissionManageServerRoom.addAction(actionManageAreaAccess);
+        permissionManageServerRoom.addAction(actionAlterArea);
+        permissionManageMeetingArea.addAction(actionManageAreaAccess);
+        permissionManageMeetingArea.addAction(actionAlterArea);
+        permissionManageCafetria.addAction(actionManageAreaAccess);
+        permissionManageCafetria.addAction(actionAlterArea);
+        permissionAccessServerRoom.addAction(actionAccessArea);
+        permissionAccessMeetingArea.addAction(actionAccessArea);
+        permissionAccessCafetria.addAction(actionAccessArea);
+        
+        //add permissions to policies
+        policyManageSenstiveAreas.addPermission(permissionManageServerRoom);
+        policyManageSenstiveAreas.addPermission(permissionManageMeetingArea);
+        policyManageSenstiveAreas.addPermission(permissionManageCafetria);
+        policyManageCommonAreas.addPermission(permissionManageMeetingArea);
+        policyManageCommonAreas.addPermission(permissionManageCafetria);
+        policyAccessSenstiveAreas.addPermission(permissionAccessServerRoom);
+        policyAccessSenstiveAreas.addPermission(permissionAccessMeetingArea);
+        policyAccessSenstiveAreas.addPermission(permissionAccessCafetria);
+        policyAccessCommonAreas.addPermission(permissionAccessMeetingArea);
+        policyAccessCommonAreas.addPermission(permissionAccessCafetria);
+        
+        //add policies to roles
+        roleRoot.getPolicies().add(policyManageSenstiveAreas);
+        roleRoot.getPolicies().add(policyManageCommonAreas);
+        roleRoot.getPolicies().add(policyAccessSenstiveAreas);
+        roleRoot.getPolicies().add(policyAccessCommonAreas);
+        roleNetworkAdmin.getPolicies().add(policyManageCommonAreas);
+        roleNetworkAdmin.getPolicies().add(policyAccessSenstiveAreas);
+        roleNetworkAdmin.getPolicies().add(policyAccessCommonAreas);
+        roleDeveloper.getPolicies().add(policyAccessCommonAreas);
+        
+        AutherizationTable.getInstance().assignRole(admin, roleRoot);
+        AutherizationTable.getInstance().assignRole(absentUser, roleDeveloper);
+        AutherizationTable.getInstance().assignRole(outsideUser, roleDeveloper);
+        AutherizationTable.getInstance().assignRole(insideUser, roleDeveloper);
     }
 
 }
