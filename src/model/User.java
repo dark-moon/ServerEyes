@@ -1,24 +1,35 @@
 
 package model;
 
+import model.incident.IncidentResponse;
+import model.incident.IncidentReporter;
 import database.DAOFactory;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
+import model.incident.ResponseLogInDB;
 
 /**
  *
  * @author kashwaa
  */
-public class User {
-    private static final DAOFactory sqlDAOFactory = DAOFactory.getDAOFactory(DAOFactory.MY_SQL);
+public class User implements IncidentReporter{
+    private static DAOFactory daoFactory;
     
+    private int id;
     private String userName, firstName, lastName, address, email;
     private NameTag tag;
     private UserState state;
+    
+    private IncidentResponse defaultResponse = new ResponseLogInDB();
 
-    public static Collection<User> getAllUsers(){
-        return sqlDAOFactory.getUserDAO().getAllUsers();
+    public static Collection<User> getAllUsers(int daoFactoryType){
+        daoFactory = DAOFactory.getDAOFactory(daoFactoryType);
+        return daoFactory.getUserDAO().getAllUsers();
+    }
+    
+    public static Collection<User> getAllUsersMySql(){
+        daoFactory = DAOFactory.getDAOFactory(DAOFactory.MY_SQL);
+        return daoFactory.getUserDAO().getAllUsers();
     }
     
     //<editor-fold defaultstate="collapsed" desc="Constructors">
@@ -52,6 +63,14 @@ public class User {
     }
     
 //<editor-fold defaultstate="collapsed" desc="getters and setters">
+    
+        public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
     
     public UserState getState(){
         return state;
@@ -110,6 +129,15 @@ public class User {
     }
     
     //</editor-fold>
+
+    private void setDefaultResponse(IncidentResponse newResponse){
+        this.defaultResponse = newResponse;
+    }
+    
+    @Override
+    public IncidentResponse getDefaultResponse() {
+        return this.defaultResponse;
+    }
 
 
 }
