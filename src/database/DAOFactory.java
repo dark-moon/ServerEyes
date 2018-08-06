@@ -16,6 +16,7 @@ public abstract class DAOFactory {
     
     public abstract AreaDAO getAreaDAO();
     public abstract UserDAO getUserDAO();
+    public abstract NameTagDAO getNameTagDAO();
     
     public static DAOFactory getDAOFactory(int factoryType){
         switch(factoryType){

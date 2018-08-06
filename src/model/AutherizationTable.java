@@ -30,7 +30,7 @@ public class AutherizationTable {
     }
     //</editor-fold>
 
-    private Collection<Role> roles;
+//    private Collection<Role> roles;
     private final Map<User, Collection<Role>> autherizationTable;
 
     private AutherizationTable() {
