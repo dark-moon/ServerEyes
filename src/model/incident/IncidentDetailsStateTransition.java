@@ -50,7 +50,8 @@ public class IncidentDetailsStateTransition extends IncidentDetails{
                 .append("\n\tto: ")
                 .append(this.attemptedState)
                 .append("\n\tattempted Action: ")
-                .append(this.attemptedAction);
+                .append(this.attemptedAction)
+                .append("\n");
         return result.toString();
     }
 

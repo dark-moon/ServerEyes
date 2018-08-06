@@ -4,6 +4,7 @@ package model;
 import model.incident.IncidentResponse;
 import model.incident.IncidentReporter;
 import database.DAOFactory;
+import database.UserDAO;
 import java.util.Collection;
 import java.util.Date;
 import model.incident.ResponseLogInDB;
@@ -22,15 +23,19 @@ public class User implements IncidentReporter{
     
     private IncidentResponse defaultResponse = new ResponseLogInDB();
 
-    public static Collection<User> getAllUsers(int daoFactoryType){
-        daoFactory = DAOFactory.getDAOFactory(daoFactoryType);
-        return daoFactory.getUserDAO().getAllUsers();
+    public static UserDAO getUserDAO(int daoFactoryType){
+        return DAOFactory.getDAOFactory(daoFactoryType).getUserDAO();
     }
     
-    public static Collection<User> getAllUsersMySql(){
-        daoFactory = DAOFactory.getDAOFactory(DAOFactory.MY_SQL);
-        return daoFactory.getUserDAO().getAllUsers();
-    }
+//    public static Collection<User> getAllUsers(int daoFactoryType){
+//        daoFactory = DAOFactory.getDAOFactory(daoFactoryType);
+//        return daoFactory.getUserDAO().getAllUsers();
+//    }
+//    
+//    public static Collection<User> getAllUsersMySql(){
+//        daoFactory = DAOFactory.getDAOFactory(DAOFactory.MY_SQL);
+//        return daoFactory.getUserDAO().getAllUsers();
+//    }
     
     //<editor-fold defaultstate="collapsed" desc="Constructors">
     public User() {
